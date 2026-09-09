@@ -7,7 +7,7 @@ def test_health():
     response = client.get("/health")
 
     assert response.status_code == 200
-    assert response.json["status"] == "DOWN"
+    assert response.json["status"] == "UP"
 
 
 def test_version():
@@ -16,7 +16,7 @@ def test_version():
     response = client.get("/version")
 
     assert response.status_code == 200
-    assert response.json["version"] == "1.0.0"
+    assert response.json["version"] == "1.1.0"
 
 
 def test_environment():
@@ -25,6 +25,7 @@ def test_environment():
     response = client.get("/environment")
 
     assert response.status_code == 200
+    assert response.json["environment"] == "development"
 
 
 def test_status():
@@ -33,7 +34,7 @@ def test_status():
     response = client.get("/status")
 
     assert response.status_code == 200
-    assert response.json["status"] == "DOWN"
+    assert response.json["status"] == "UP"
 
 
 def test_metrics():
