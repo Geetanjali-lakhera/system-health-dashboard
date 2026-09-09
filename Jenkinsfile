@@ -5,15 +5,10 @@ pipeline {
         IMAGE_NAME = "system-health-dashboard"
         IMAGE_TAG = "build-${BUILD_NUMBER}"
         CONTAINER_NAME = "jenkins-health-check-${BUILD_NUMBER}"
+        NETWORK_NAME = "jenkins-net"
     }
 
     stages {
-
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
 
         stage('Install') {
             steps {
@@ -27,36 +22,44 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh './venv/bin/python -m pytest -v'
+                sh '''
+                    ./venv/bin/python -m pytest -v
+                '''
             }
         }
 
         stage('Build') {
             steps {
-                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+                sh '''
+                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                '''
             }
         }
 
         stage('Tag') {
             steps {
-                sh 'docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest'
+                sh '''
+                    docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
+                '''
             }
         }
 
         stage('Health Check') {
             steps {
                 sh '''
-                    docker network create jenkins-net || true
+                    docker network inspect ${NETWORK_NAME} >/dev/null 2>&1 || \
+                    docker network create ${NETWORK_NAME}
 
                     docker run -d \
-                      --name ${CONTAINER_NAME} \
-                      --network jenkins-net \
-                      -e ENVIRONMENT=production \
-                      ${IMAGE_NAME}:${IMAGE_TAG}
+                        --name ${CONTAINER_NAME} \
+                        --network ${NETWORK_NAME} \
+                        -e ENVIRONMENT=production \
+                        ${IMAGE_NAME}:${IMAGE_TAG}
 
                     sleep 5
 
-                    curl --fail http://${CONTAINER_NAME}:5000/health
+                    curl --fail \
+                        http://${CONTAINER_NAME}:5000/health
                 '''
             }
         }
