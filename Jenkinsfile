@@ -18,16 +18,16 @@ pipeline {
         stage('Install') {
             steps {
                 sh '''
-            python3 -m venv venv
-            ./venv/bin/pip install --upgrade pip
-            ./venv/bin/pip install -r requirements.txt
-        '''
+                    python3 -m venv venv
+                    ./venv/bin/pip install --upgrade pip
+                    ./venv/bin/pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Test') {
             steps {
-              sh './venv/bin/python -m pytest -v'
+                sh './venv/bin/python -m pytest -v'
             }
         }
 
@@ -46,15 +46,17 @@ pipeline {
         stage('Health Check') {
             steps {
                 sh '''
+                    docker network create jenkins-net || true
+
                     docker run -d \
                       --name ${CONTAINER_NAME} \
-                      -p 5001:5000 \
+                      --network jenkins-net \
                       -e ENVIRONMENT=production \
                       ${IMAGE_NAME}:${IMAGE_TAG}
 
                     sleep 5
 
-                    curl --fail http://localhost:5001/health
+                    curl --fail http://${CONTAINER_NAME}:5000/health
                 '''
             }
         }
