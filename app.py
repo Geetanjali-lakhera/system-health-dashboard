@@ -3,7 +3,7 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 REQUEST_COUNT = 0
 
 
