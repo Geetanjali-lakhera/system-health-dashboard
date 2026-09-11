@@ -20,7 +20,7 @@ A lightweight Flask-based System Health Dashboard API built as part of the C456 
 | `/environment` | Returns configured environment |
 | `/status` | Returns overall application status |
 | `/metrics` | Returns request count |
-| `/info` | Returns application information |
+
 
 ## Merge Conflict Resolution
 
