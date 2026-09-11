@@ -53,11 +53,5 @@ def metrics():
         "requests": REQUEST_COUNT
     })
 
-@app.route("/info")
-def info():
-    return jsonify({
-        "application": "system-health-dashboard",
-        "description": "System health monitoring API"
-    })
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
